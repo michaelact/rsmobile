@@ -9,5 +9,5 @@ data class HomeScreenState(
     val currentDate: LocalDate = LocalDate.now(),
     val isLoading: Boolean = false,
     val error: String? = null,
-    val userLocation: String = "Denpasar, Bali" // Dummy location
+    val userLocation: String = "Unknown Location"
 )
