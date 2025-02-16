@@ -59,17 +59,44 @@ class HospitalRepository @Inject constructor(
                     println("Filtering hospital ${hospital.name} with region: ${hospital.region}, matches user city $userCity")
                 }
             }
+            .map { hospital ->
+                hospital.copy(
+                    distance = hospital.coordinates?.let { coords ->
+                        calculateDistance(
+                            userCoordinates.latitude,
+                            userCoordinates.longitude,
+                            coords.latitude,
+                            coords.longitude
+                        )
+                    }
+                )
+            }
             .sortedWith(compareBy(
-                // Sort by coordinates existence (hospitals with coordinates first)
+                // Sort by coordinates existence
                 { it.coordinates == null },
-                // Sort by distance to user
-                { it.coordinates?.let { coordinates ->
-                    abs(coordinates.latitude - userCoordinates.latitude) + Math.abs(coordinates.longitude - userCoordinates.longitude)
-                } ?: Double.MAX_VALUE },
+                // Sort by calculated distance
+                { it.distance ?: Double.MAX_VALUE }
             ))
 
         emit(sortedHospitals)
     }.catch { e ->
         emit(emptyList())
     }
+}
+
+// calculateDistance function
+private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+    val R = 6371 // Radius of the earth in km
+    val dLat = deg2rad(lat2 - lat1)
+    val dLon = deg2rad(lon2 - lon1)
+    val a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2)
+    val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    return R * c
+}
+
+private fun deg2rad(deg: Double): Double {
+    return deg * (Math.PI / 180)
 }
