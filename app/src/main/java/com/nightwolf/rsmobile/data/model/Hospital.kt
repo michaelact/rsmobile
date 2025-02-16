@@ -1,14 +1,19 @@
 // data/model/Hospital.kt
 package com.nightwolf.rsmobile.data.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "hospitals")
 data class Hospital(
+    @PrimaryKey
     val name: String = "",
     val address: String = "",
     val region: String = "",
     val phone: String = "",
     val province: String = "",
     var distance: Double? = null,
-    var coordinates: Coordinates? = null,
+    var coordinates: Coordinates?,
     val imageUrl: String = "https://cdn.pixabay.com/photo/2020/10/30/17/48/hospital-5699287_1280.jpg"
 )
 
