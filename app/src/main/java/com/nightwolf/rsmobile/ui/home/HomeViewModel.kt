@@ -22,40 +22,50 @@ class HomeViewModel @Inject constructor(
     val state: StateFlow<HomeScreenState> = _state.asStateFlow()
 
     init {
-        loadUserLocation()
-        loadHospitals()
-    }
-
-    private fun loadUserLocation() {
         viewModelScope.launch {
-            try {
-                val location = locationRepository.getUserLocation()
-                _state.update { it.copy(userLocation = location) }
-            } catch (e: Exception) {
-                _state.update { it.copy(error = "Could not determine location") }
-            }
+            loadUserLocation()
+            loadHospitals()
         }
     }
 
-    fun loadHospitals() {
+    fun refreshData() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, error = null) }
-            try {
-                hospitalRepository.getNearbyHospitals().collect { hospitals ->
-                    _state.update {
-                        it.copy(
-                            hospitals = hospitals,
-                            isLoading = false
-                        )
-                    }
-                }
-            } catch (e: Exception) {
+            loadUserLocation()
+            loadHospitals()
+        }
+    }
+
+    private suspend fun loadUserLocation() {
+        _state.update { it.copy(isLoading = true, error = null) }
+        try {
+            val location = locationRepository.getUserLocation()
+            _state.update { it.copy(userCity = location?.city ?: "Unknown") }
+            _state.update { it.copy(userRegionName = location?.regionName ?: "Unknown") }
+            val coordinates = locationRepository.getUserCoordinates()
+            _state.update { it.copy(userCoordinates = coordinates) }
+            println("User location: ${location?.city}, ${location?.regionName}, ${coordinates.latitude}, ${coordinates.longitude}")
+        } catch (e: Exception) {
+            _state.update { it.copy(error = "Could not determine location") }
+        }
+    }
+
+    private suspend fun loadHospitals() {
+        try {
+            println("Loading hospitals near ${state.value.userCity} and coordinates ${state.value.userCoordinates}")
+            hospitalRepository.getNearbyHospitals(state.value.userCity, state.value.userCoordinates).collect { hospitals ->
                 _state.update {
                     it.copy(
-                        isLoading = false,
-                        error = e.message ?: "Unknown error occurred"
+                        hospitals = hospitals,
+                        isLoading = false
                     )
                 }
+            }
+        } catch (e: Exception) {
+            _state.update {
+                it.copy(
+                    isLoading = false,
+                    error = e.message ?: "Unknown error occurred"
+                )
             }
         }
     }

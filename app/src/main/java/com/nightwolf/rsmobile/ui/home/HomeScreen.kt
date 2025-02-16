@@ -53,7 +53,7 @@ fun HomeScreen(
             TopAppBar(
                 title = { Text("Hospitals Near You") },
                 actions = {
-                    IconButton(onClick = { viewModel.loadHospitals() }) {
+                    IconButton(onClick = { viewModel.refreshData() }) {
                         Icon(Icons.Default.Refresh, contentDescription = "Refresh")
                     }
                 }
@@ -64,7 +64,7 @@ fun HomeScreen(
             state.isLoading -> LoadingIndicator()
             state.error != null -> ErrorView(
                 message = state.error ?: "Unknown error occurred",
-                onRetry = { viewModel.loadHospitals() }
+                onRetry = { viewModel.refreshData() }
             )
             else -> {
                 LazyColumn(
@@ -82,7 +82,7 @@ fun HomeScreen(
                                 date = state.currentDate.format(
                                     DateTimeFormatter.ofPattern("EEEE, MMMM d")
                                 ),
-                                location = state.userLocation
+                                location = "${state.userCity}, ${state.userRegionName}"
                             )
                         }
                     }
@@ -92,7 +92,9 @@ fun HomeScreen(
                             hospital = hospital,
                             onAddressClick = {
                                 val encodedAddress = Uri.encode(hospital.address)
-                                val uri = "https://www.google.com/maps/place/$encodedAddress"
+                                val uri = "https://www.google.com/maps/search/?api=1&query=$encodedAddress".also {
+                                    android.util.Log.d("HomeScreen", "Maps URL: $it")
+                                }
                                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
                                 context.startActivity(intent)
                             }
