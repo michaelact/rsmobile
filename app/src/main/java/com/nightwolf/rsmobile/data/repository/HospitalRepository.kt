@@ -26,6 +26,7 @@ class HospitalRepository @Inject constructor(
             val fetchedHospitals = hospitalApi.getHospitals().map { hospital ->
                 val coordinates = try {
                     val response = geocodingApi.getCoordinates(hospital.name)
+                    println("Geocoding response for ${hospital.name}: $response")
                     response.features.firstOrNull()?.let {
                         Coordinates(
                             latitude = it.geometry.coordinates[1],
@@ -33,6 +34,7 @@ class HospitalRepository @Inject constructor(
                         )
                     }
                 } catch (e: Exception) {
+                    println("Geocoding failed for ${hospital.name}: ${e.message}")
                     null
                 }
 
