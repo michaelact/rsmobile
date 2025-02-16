@@ -8,7 +8,8 @@ data class Hospital(
     val phone: String,
     val province: String,
     var distance: Double? = null,
-    var coordinates: Coordinates? = null
+    var coordinates: Coordinates? = null,
+    val imageUrl: String = "https://cdn.pixabay.com/photo/2020/10/30/17/48/hospital-5699287_1280.jpg"
 )
 
 data class Coordinates(
