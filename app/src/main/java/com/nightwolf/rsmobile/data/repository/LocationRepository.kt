@@ -11,7 +11,6 @@ class LocationRepository @Inject constructor(
             val response = locationApi.getUserLocation()
             "${response.city}, ${response.regionName}"
         } catch (e: Exception) {
-            android.util.Log.e("LocationRepository", "Error getting user location", e)
             "Unknown Location"
         }
     }

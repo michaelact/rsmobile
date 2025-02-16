@@ -2,11 +2,11 @@
 package com.nightwolf.rsmobile.data.model
 
 data class Hospital(
-    val name: String,
-    val address: String,
-    val region: String,
-    val phone: String,
-    val province: String,
+    val name: String = "",
+    val address: String = "",
+    val region: String = "",
+    val phone: String = "",
+    val province: String = "",
     var distance: Double? = null,
     var coordinates: Coordinates? = null,
     val imageUrl: String = "https://cdn.pixabay.com/photo/2020/10/30/17/48/hospital-5699287_1280.jpg"

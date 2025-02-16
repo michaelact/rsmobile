@@ -1,6 +1,8 @@
 package com.nightwolf.rsmobile.di
 
+import com.nightwolf.rsmobile.data.network.HospitalApi
 import com.nightwolf.rsmobile.data.network.LocationApi
+import com.nightwolf.rsmobile.data.repository.HospitalRepository
 import com.nightwolf.rsmobile.data.repository.LocationRepository
 import dagger.Module
 import dagger.Provides
@@ -25,9 +27,27 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideHospitalApi(): HospitalApi {
+        return Retrofit.Builder()
+            .baseUrl(HospitalApi.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(HospitalApi::class.java)
+    }
+
+    @Provides
+    @Singleton
     fun provideLocationRepository(
         locationApi: LocationApi
     ): LocationRepository {
         return LocationRepository(locationApi)
+    }
+
+    @Provides
+    @Singleton
+    fun provideHospitalRepository(
+        hospitalApi: HospitalApi
+    ): HospitalRepository {
+        return HospitalRepository(hospitalApi)
     }
 }
